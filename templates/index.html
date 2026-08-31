@@ -5,18 +5,34 @@
 </head>
 <body>
     <h1>You are calling me from {{request.remote_addr}}</h1>
-    <form action="/add" method="POST">
-        <input name="yourname" placeholder="Yourname" required />
-        <input name="message" placeholder="Message" required />
-        <button type="submit">Add Comment</button>
+
+    <!-- Add message to website with form -->
+    <form action="/add_router" method="POST">
+        <label for="Router IP">Router IP:</label>
+        <input name="Router IP:" placeholder="Router IP" id="Router IP" required />
+
+        <label for="username">Username:</label>
+        <input name="Username:" placeholder="Username for SSH" id="username" required />
+
+        <label for="password">Password:</label>
+        <input name="Password:" placeholder="Password for SSH" id="password" required />
+
+        <button type="submit">Add</button>
     </form>
 
-    <ul>
-        {% for comment in data %}
+    <h4>Routers List</h4>
+    <ol>
+        {% for cred in data %}
             <li>
-	            {{ comment.yourname }} - {{ comment.message }}
+	            {{ cred.ip }} - {{ cred.username }}
+
+                <!-- Delete comment with form and special idx variable for each comment -->
+                <form method="POST" action="{{ url_for('delete_router', idx = cred['idx']) }}" style="display:inline">
+                    <button type="submit">Delete</button>
+                </form>
             </li>
         {% endfor %}
-    </ul>
+    </ol>
+
 </body>
 </html>

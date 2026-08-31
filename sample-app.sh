@@ -1,26 +1,38 @@
 #!/bin/bash
 
-mkdir tempdir
-mkdir tempdir/templates
-mkdir tempdir/static
+current_dir=$(pwd)
 
-cp sample_app.py tempdir/.
-cp -r templates/* tempdir/templates/.
-cp -r static/* tempdir/static/.
+# Reset
+rm -rf "$current_dir/tempdir"
+pip3 freeze > "$current_dir/requirements.txt"
+docker rm -f web mongo 2>/dev/null || true
+docker network rm app-net 2>/dev/null || true
 
-# Create Dockerfile in tempdir
-echo "FROM python" >> tempdir/Dockerfile
-echo "RUN pip install flask" >> tempdir/Dockerfile
-echo "COPY  ./static /home/myapp/static/" >> tempdir/Dockerfile
-echo "COPY  ./templates /home/myapp/templates/" >> tempdir/Dockerfile
-echo "COPY  sample_app.py /home/myapp/" >> tempdir/Dockerfile
-echo "EXPOSE 8080" >> tempdir/Dockerfile
-echo "CMD python3 /home/myapp/sample_app.py" >> tempdir/Dockerfile
+mkdir -p "$current_dir/tempdir/templates"
+mkdir -p "$current_dir/tempdir/static"
 
-# Build docker images name sampleapp from Dockerfile in tempdir and run container from this image
-cd tempdir
-docker build -t sampleapp .
-docker run -t -d -p 8080:8080 --name samplerunning sampleapp
+cp "$current_dir/app.py" "$current_dir/tempdir/"
+cp "$current_dir/requirements.txt" "$current_dir/tempdir/"
+cp -r "$current_dir/templates"/* "$current_dir/tempdir/templates/" 2>/dev/null || true
+cp -r "$current_dir/static"/* "$current_dir/tempdir/static/" 2>/dev/null || true
 
-# See docker container status
+echo "FROM python:3.10-slim" > "$current_dir/tempdir/Dockerfile"
+echo "WORKDIR /home/myapp" >> "$current_dir/tempdir/Dockerfile"
+echo "COPY ./requirements.txt ." >> "$current_dir/tempdir/Dockerfile"
+echo "RUN pip install --no-cache-dir -r requirements.txt" >> "$current_dir/tempdir/Dockerfile"
+echo "COPY ./static ./static" >> "$current_dir/tempdir/Dockerfile"
+echo "COPY ./templates ./templates" >> "$current_dir/tempdir/Dockerfile"
+echo "COPY ./app.py ." >> "$current_dir/tempdir/Dockerfile"
+echo "EXPOSE 8080" >> "$current_dir/tempdir/Dockerfile"
+echo "CMD python3 /home/myapp/app.py" >> "$current_dir/tempdir/Dockerfile"
+
+cd "$current_dir/tempdir"
+
+docker network create app-net
+docker run -d -p 27017:27017 --network app-net -v mongo-data:/data/db --name mongo mongo:6
+docker build -t web .
+docker run -d -p 8080:8080 --network app-net --name web web
+
+echo "============= | Container Status | ============="
 docker ps -a
+echo "================================================"

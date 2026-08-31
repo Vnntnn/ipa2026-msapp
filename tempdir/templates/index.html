@@ -5,5 +5,34 @@
 </head>
 <body>
     <h1>You are calling me from {{request.remote_addr}}</h1>
+
+    <!-- Add message to website with form -->
+    <form action="/add_router" method="POST">
+        <label for="Router IP">Router IP:</label>
+        <input name="Router IP:" placeholder="Router IP" id="Router IP" required />
+
+        <label for="username">Username:</label>
+        <input name="Username:" placeholder="Username for SSH" id="username" required />
+
+        <label for="password">Password:</label>
+        <input name="Password:" placeholder="Password for SSH" id="password" required />
+
+        <button type="submit">Add</button>
+    </form>
+
+    <h4>Routers List</h4>
+    <ol>
+        {% for cred in data %}
+            <li>
+	            {{ cred.ip }} - {{ cred.username }}
+
+                <!-- Delete comment with form and special idx variable for each comment -->
+                <form method="POST" action="{{ url_for('delete_router', idx = cred['idx']) }}" style="display:inline">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ol>
+
 </body>
 </html>

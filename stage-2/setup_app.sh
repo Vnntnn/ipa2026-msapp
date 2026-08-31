@@ -26,6 +26,12 @@ echo "COPY ./app.py ." >> "$current_dir/tempdir/Dockerfile"
 echo "EXPOSE 8080" >> "$current_dir/tempdir/Dockerfile"
 echo "CMD python3 /home/myapp/app.py" >> "$current_dir/tempdir/Dockerfile"
 
+cat << 'EOF' > myfile.txt
+Line 1
+Line 2
+Line 3
+EOF
+
 cd "$current_dir/tempdir"
 
 docker network create app-net

@@ -1,0 +1,37 @@
+<html>
+<head>
+    <title>Sample app</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+    <h1>You are calling me from {{request.remote_addr}}</h1>
+    <h2>Register Router</h2>
+
+    <form action="/add_router" method="POST">
+        <label for="Router IP">Router IP:</label>
+        <input name="Router IP:" placeholder="Router IP" id="Router IP" required />
+
+        <label for="username">Username:</label>
+        <input name="Username:" placeholder="Username for SSH" id="username" required />
+
+        <label for="password">Password:</label>
+        <input name="Password:" placeholder="Password for SSH" id="password" required />
+
+        <button type="submit">Add</button>
+    </form>
+
+    <h4>Routers List</h4>
+    <ol>
+        {% for cred in data %}
+            <li>
+	            {{ cred.ip }} - {{ cred.username }}
+
+                <form method="POST" action="{{ url_for('delete_router', idx = cred['idx']) }}" style="display:inline">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ol>
+
+</body>
+</html>

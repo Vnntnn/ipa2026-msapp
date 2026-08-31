@@ -11,6 +11,14 @@ router_col = creds_db["ssh"]
 
 @app.route('/')
 def main():
+        all_routers = router_col.find().sort("_id", 1)
+
+        for current_idx, router in enumerate(all_routers, start = 1):
+                router_col.update_one(
+                        {"_id": router["_id"]}, 
+                        {"$set": {"idx": current_idx}}
+                )
+
         return render_template('index.html', data = router_col.find())
 
 
@@ -40,7 +48,12 @@ def add_router():
 @app.route("/delete_router/<int:idx>", methods=["POST"])
 def delete_router(idx):
         try:
-                router_col.delete_one({"idx": idx})
+                target_idx = int(idx)
+                router_col.delete_one({"idx": target_idx})
+                router_col.update_many(
+                        {"idx": {"$gt": target_idx}}, 
+                        {"$inc": {"idx": -1}}
+                )
         except Exception:
                 pass
 

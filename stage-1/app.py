@@ -1,17 +1,11 @@
-import os
 from flask import Flask, request, render_template, redirect, url_for
 from pymongo import MongoClient, DESCENDING
 from bson import ObjectId
 
 app = Flask(__name__)
 
-
-mongo_uri  = os.environ.get("MONGO_URI")
-db_name    = os.environ.get("DB_NAME")
-
-
-client = MongoClient(mongo_uri)
-creds_db = client[db_name]
+client = MongoClient("mongodb://mongo:27017/")
+creds_db = client["RouterCreds"]
 router_col = creds_db["ssh"]
 
 

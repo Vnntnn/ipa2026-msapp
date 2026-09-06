@@ -5,39 +5,65 @@ current_dir=$(pwd)
 # Reset
 rm -rf "$current_dir/tempdir"
 pip3 freeze > "$current_dir/requirements.txt"
-docker rm -f web mongo 2>/dev/null || true
-docker network rm app-net 2>/dev/null || true
+docker compose down -v 2>/dev/null || true
 
 mkdir -p "$current_dir/tempdir/templates"
 mkdir -p "$current_dir/tempdir/static"
 
+cp "$current_dir/.env" "$current_dir/tempdir/" 2>/dev/null || true
 cp "$current_dir/app.py" "$current_dir/tempdir/"
 cp "$current_dir/requirements.txt" "$current_dir/tempdir/"
 cp -r "$current_dir/templates"/* "$current_dir/tempdir/templates/" 2>/dev/null || true
 cp -r "$current_dir/static"/* "$current_dir/tempdir/static/" 2>/dev/null || true
 
-echo "FROM python:3.10-slim" > "$current_dir/tempdir/Dockerfile"
-echo "WORKDIR /home/myapp" >> "$current_dir/tempdir/Dockerfile"
-echo "COPY ./requirements.txt ." >> "$current_dir/tempdir/Dockerfile"
-echo "RUN pip install --no-cache-dir -r requirements.txt" >> "$current_dir/tempdir/Dockerfile"
-echo "COPY ./static ./static" >> "$current_dir/tempdir/Dockerfile"
-echo "COPY ./templates ./templates" >> "$current_dir/tempdir/Dockerfile"
-echo "COPY ./app.py ." >> "$current_dir/tempdir/Dockerfile"
-echo "EXPOSE 8080" >> "$current_dir/tempdir/Dockerfile"
-echo "CMD python3 /home/myapp/app.py" >> "$current_dir/tempdir/Dockerfile"
+cat << 'EOF' > "$current_dir/tempdir/Dockerfile"
+FROM python
+WORKDIR /home/myapp
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY ./static ./static
+COPY ./templates ./templates
+COPY ./app.py .
+EXPOSE 8080
+CMD ["python3", "app.py"]
+EOF
 
-cat << 'EOF' > myfile.txt
-Line 1
-Line 2
-Line 3
+cat << 'EOF' > "$current_dir/tempdir/docker-compose.yml"
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    networks:
+      - app-net
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/"
+      DB_NAME: "ipa2026_db"
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-net
+    env_file:
+      - .env
+
+volumes:
+  mongo-data:
+
+networks:
+  app-net:
 EOF
 
 cd "$current_dir/tempdir"
-
-docker network create app-net
-docker run -d -p 27017:27017 --network app-net -v mongo-data:/data/db --name mongo mongo:6
-docker build -t web .
-docker run -d -p 8080:8080 --network app-net --name web web
+docker compose up --build --detach 
 
 echo "============= | Container Status | ============="
 docker ps -a

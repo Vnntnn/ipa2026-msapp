@@ -1,0 +1,51 @@
+<html>
+<head>
+	<title>Router Interface Status</title>
+	<link rel="stylesheet" href="/static/style.css" />
+	<style>
+		table {
+			border-collapse: collapse;
+		}
+
+		table, th, td {
+			border: 1px solid #000;
+		}
+
+		th, td {
+			padding: 8px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Router: {{ router_ip }}</h1>
+
+	<p><a href="{{ url_for('main') }}">Back to router list</a></p>
+
+	{% if interfaces %}
+	<table>
+		<thead>
+			<tr>
+				<th>Timestamp</th>
+				<th>Interface</th>
+				<th>IP Address</th>
+				<th>Status</th>
+				<th>Protocol</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in interfaces %}
+			<tr>
+				<td>{{ row.timestamp }}</td>
+				<td>{{ row.interface }}</td>
+				<td>{{ row.ip_address }}</td>
+				<td>{{ row.status }}</td>
+				<td>{{ row.protocol }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<p>No interface status records found for this router.</p>
+	{% endif %}
+</body>
+</html>

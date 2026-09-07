@@ -144,7 +144,9 @@ networks:
 EOF
 
 cd "$current_dir/tempdir"
-docker compose up --build --detach 
+# docker compose up --build --detach 
+# Make 3 workers containers to scaling workload.
+docker compose up --build -d --scale worker=3
 
 echo "============= | Container Status | ============="
 docker ps -a

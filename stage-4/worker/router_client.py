@@ -1,4 +1,7 @@
-import ntc_templates, os, json
+import json
+import os
+
+import ntc_templates
 
 from netmiko import ConnectHandler
 from database import save_interface_status
@@ -21,11 +24,15 @@ def get_interfaces(ip, username, password):
         # conn.enable()
         result = conn.send_command("show ip int br", use_textfsm=True)
         interfaces_json = json.dumps(result)
-        
-        save_interface_status(ip, json.loads(interfaces_json))
-        
-        conn.disconnect()
-        print("Done for save interface router:", ip, )
 
-if __name__=='__main__':
+        save_interface_status(ip, json.loads(interfaces_json))
+
+        conn.disconnect()
+        print(
+            "Done for save interface router:",
+            ip,
+        )
+
+
+if __name__ == "__main__":
     get_interfaces()

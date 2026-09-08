@@ -1,0 +1,86 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    networks:
+      - app-net
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/"
+      DB_NAME: "${DB_NAME}"
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-net
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" # AMQP Protocol port
+      - "15672:15672" # Web Management UI
+    networks:
+      - app-net
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq_data:/data/rabbitmq
+
+  scheduler:
+    build: ./scheduler/
+    ports:
+      - 2973:2973
+    networks:
+      - app-net
+    depends_on:
+      - mongo
+      - rabbitmq
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/"
+      DB_NAME: "${DB_NAME}"
+      COLLECTIONS_NAME: "${COLLECTIONS_NAME}"
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_ROUTER_QUEUE_JOBS: ${RABBITMQ_ROUTER_QUEUE_JOBS}
+      RABBITMQ_ROUTER_EXCHANGE: ${RABBITMQ_ROUTER_EXCHANGE}
+      RABBITMQ_ROUTER_ROUTING_KEY: ${RABBITMQ_ROUTER_ROUTING_KEY}
+      PRODUCER_HOST: ${PRODUCER_HOST}
+
+  worker:
+    build: ./worker/
+    networks:
+      - app-net
+    depends_on:
+      - rabbitmq
+      - mongo
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/"
+      DB_NAME: "${DB_NAME}"
+      RABBITMQ_HOST: ${PRODUCER_HOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
+
+volumes:
+  mongo-data:
+  rabbitmq_data:
+
+networks:
+  app-net:

@@ -1,0 +1,6 @@
+Flask
+pika
+pymongo
+requests
+netmiko
+ntc-templates

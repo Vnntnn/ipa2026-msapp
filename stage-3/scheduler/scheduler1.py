@@ -22,5 +22,6 @@ def scheduler():
         count += 1
         time.sleep(10)
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     scheduler()

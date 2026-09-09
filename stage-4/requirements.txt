@@ -4,3 +4,4 @@ pymongo
 requests
 netmiko
 ntc-templates
+black

@@ -22,11 +22,7 @@ def produce(host: str, body):
     config = get_rabbit_config()
     credentials = pika.PlainCredentials(config["user"], config["password"])
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(
-            host=str(host),
-            port=5672,
-            credentials=credentials,
-        )
+        pika.ConnectionParameters(host=str(host), port=5672, credentials=credentials)
     )
     channel = connection.channel()
 

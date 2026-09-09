@@ -28,10 +28,7 @@ def get_interfaces(ip, username, password):
         save_interface_status(ip, json.loads(interfaces_json))
 
         conn.disconnect()
-        print(
-            "Done for save interface router:",
-            ip,
-        )
+        print("Done for save interface router:", ip)
 
 
 if __name__ == "__main__":

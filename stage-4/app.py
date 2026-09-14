@@ -68,7 +68,7 @@ def get_router(ip):
 
     for record in records:
         timestamp = record.get("timestamp")
-        for interface in record.get("interfaces", []):
+        for interface in record.get("interfaces", [])[:5]:
             interface_rows.append(
                 {
                     "timestamp": timestamp,
@@ -78,6 +78,10 @@ def get_router(ip):
                     "protocol": interface.get("proto") or "",
                 }
             )
+            if len(interface_rows) >= 5:
+                break
+        if len(interface_rows) >= 5:
+            break
 
     return render_template(
         "router_detail.html", router_ip=ip, interfaces=interface_rows

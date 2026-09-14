@@ -54,6 +54,13 @@ jobs:
           echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}"
           echo "RABBITMQ_DEFAULT_USER=${{ secrets.RABBITMQ_DEFAULT_USER }}"
           echo "RABBITMQ_DEFAULT_PASS=${{ secrets.RABBITMQ_DEFAULT_PASS }}"
+          echo "DB_NAME=${{ secrets.DB_NAME }}"
+          echo "COLLECTIONS_NAME=${{ secrets.COLLECTIONS_NAME }}"
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}"
+          echo "PRODUCER_HOST=${{ secrets.PRODUCER_HOST }}"
+          echo "RABBITMQ_ROUTER_EXCHANGE=${{ secrets.RABBITMQ_ROUTER_EXCHANGE }}"
+          echo "RABBITMQ_ROUTER_QUEUE_JOBS=${{ secrets.RABBITMQ_ROUTER_QUEUE_JOBS }}"
+          echo "RABBITMQ_ROUTER_ROUTING_KEY=${{ secrets.RABBITMQ_ROUTER_ROUTING_KEY }}"
         } > .env
         chmod 600 .env
 

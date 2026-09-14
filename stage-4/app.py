@@ -67,17 +67,18 @@ def get_router(ip):
     )
 
     for record in records:
-        timestamp = record.get("timestamp")
-        for interface in record.get("interfaces", []):
-            interface_rows.append(
-                {
-                    "timestamp": timestamp,
-                    "interface": interface.get("interface") or "",
-                    "ip_address": interface.get("ip_address") or "",
-                    "status": interface.get("status") or "",
-                    "protocol": interface.get("proto") or "",
-                }
-            )
+        for _ in range(5):
+            timestamp = record.get("timestamp")
+            for interface in record.get("interfaces", []):
+                interface_rows.append(
+                    {
+                        "timestamp": timestamp,
+                        "interface": interface.get("interface") or "",
+                        "ip_address": interface.get("ip_address") or "",
+                        "status": interface.get("status") or "",
+                        "protocol": interface.get("proto") or "",
+                    }
+                )
 
     return render_template(
         "router_detail.html", router_ip=ip, interfaces=interface_rows

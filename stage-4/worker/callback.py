@@ -1,3 +1,4 @@
+import time
 from bson import json_util
 from router_client import get_interfaces
 
@@ -8,6 +9,8 @@ def callback(ch, method, props, body):
     router_username = job["username"]
     router_password = job["password"]
     print(f"Received job for router {router_ip}", flush=True)
+
+    time.sleep(30)
 
     try:
         get_interfaces(router_ip, router_username, router_password)

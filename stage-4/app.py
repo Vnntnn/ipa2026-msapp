@@ -60,7 +60,11 @@ def delete_router(idx):
 @app.route("/router/<string:ip>")
 def get_router(ip):
     interface_rows = []
-    records = interface_status_col.find({"router_ip": ip}).sort("timestamp", DESCENDING)
+    records = (
+        interface_status_col.find({"router_ip": ip})
+        .sort("timestamp", DESCENDING)
+        .limit(5)
+    )
 
     for record in records:
         timestamp = record.get("timestamp")

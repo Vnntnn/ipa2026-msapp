@@ -27,17 +27,17 @@ jobs:
         for dir in stage-4/tempdir tempdir .; do
           if [ -f "$dir/docker-compose.yml" ]; then
             if [ ! -f "$dir/docker-compose.prod.yml" ]; then
-              cat << 'EOF' > "$dir/docker-compose.prod.yml"
-              services:
-                web:
-                  image: ${DOCKERHUB_USERNAME}/web:latest
+              cat > "$dir/docker-compose.prod.yml" <<EOF
+services:
+  web:
+    image: ${DOCKERHUB_USERNAME}/web:latest
 
-                scheduler:
-                  image: ${DOCKERHUB_USERNAME}/scheduler:latest
+  scheduler:
+    image: ${DOCKERHUB_USERNAME}/scheduler:latest
 
-                worker:
-                  image: ${DOCKERHUB_USERNAME}/worker:latest
-              EOF
+  worker:
+    image: ${DOCKERHUB_USERNAME}/worker:latest
+EOF
             fi
 
             if [ -f "$dir/docker-compose.prod.yml" ]; then
@@ -46,7 +46,7 @@ jobs:
             fi
           fi
         done
- 
+
         echo "docker-compose.yml not found in stage-4/tempdir, tempdir, or repo root"
         find . -maxdepth 4 -name 'docker-compose*.yml'
         exit 1
